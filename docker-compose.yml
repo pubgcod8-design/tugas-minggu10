@@ -1,0 +1,41 @@
+services:
+  # Service 1: Database MySQL
+  db_mysql:
+    image: mysql:8.0
+    container_name: db_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPass123
+      MYSQL_DATABASE: wordpress_db
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: WpPass123
+    volumes:
+      - wp_data:/var/lib/mysql
+    networks:
+      - wp_network
+    restart: always
+ 
+  # Service 2: Aplikasi Web WordPress
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress_web
+    depends_on:
+      - db_mysql
+    ports:
+      - "8000:80"
+    environment:
+      WORDPRESS_DB_HOST: db_mysql:3306
+      WORDPRESS_DB_NAME: wordpress_db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: WpPass123
+    networks:
+      - wp_network
+    restart: always
+ 
+# Volume persisten untuk data MySQL
+volumes:
+  wp_data:
+ 
+# Jaringan terisolasi
+networks:
+  wp_network:
+    driver: bridge
